@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="post" action="{{ url_for('new_question', test_id=test_id) }}"
+      novalidate>
+    {{ form.csrf_token }}
+    <div class="form-group">
+        {{ form.question.label(class="form-control-label") }}
+        {{ form.question(class="form-control") }}
+        {% if form.question.errors %}
+        {% for error in form.question.errors %}
+        <small><span style="color: red; ">{{ error }}</span></small>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group">
+      {{ form.num_answers.label(class="form-control-label") }}
+      {{ form.num_answers(class="form-control") }}
+      {% if form.num_answers.errors %}
+        {% for error in form.num_answers.errors %}
+          <small><span style="color: red; ">{{ error }}</span></small>
+        {% endfor %}
+      {% endif %}
+      </div>
+      {{ form.submit }}
+    <button type="submit" class="btn btn-primary">Užpildyti klausimus</button>
+
+</form>
+{% endblock %}

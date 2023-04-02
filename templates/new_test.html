@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<title>New TEST</title>
+
+<h1>New Test</h1>
+
+  <form method="post" action="{{ url_for('new_test') }}" novalidate>
+      {{ form.csrf_token }}
+      <div class="form-group">
+      {{ form.name.label(class="form-control-label") }}
+      {{ form.name(class="form-control") }}
+      {% if form.name.errors %}
+        {% for error in form.name.errors %}
+          <small><span style="color: red; ">{{ error }}</span></small>
+        {% endfor %}
+      {% endif %}
+      </div>
+      <div class="form-group">
+      {{ form.num_questions.label(class="form-control-label") }}
+      {{ form.num_questions(class="form-control") }}
+      {% if form.num_questions.errors %}
+        {% for error in form.num_questions.errors %}
+          <small><span style="color: red; ">{{ error }}</span></small>
+        {% endfor %}
+      {% endif %}
+      </div>
+      {{ form.submit }}
+  </form>
+{% endblock %}

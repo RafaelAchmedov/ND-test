@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if score is none %}
+<h1>{{ test.name }}</h1>
+<form action="{{ url_for('submit_test', test_id=test.id) }}" method="post">
+    {% for question in test.questions %}
+    <h3>{{ question.text }}</h3>
+    <ul>
+        {% for answer in question.answers %}
+        <li>
+            <input type="checkbox" name="answers[]" value="{{ answer.id }}" id="{{ answer.id }}">
+            <label for="{{ answer.id }}">{{ answer.text }}</label>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+    <input type="text" name="name" placeholder="Enter your name">
+    <button type="submit">Submit</button>
+{% endif %}
+</form>
+
+{% if score is not none %}
+<h2>Dear, {{ name }}  </h2>
+<h2>Correct answers are:</h2>
+<ol>
+    {% for question in test.questions %}
+    {% for answer in question.answers %}
+    {% if answer.is_correct %}
+    <li>{{ question.text }} - <b>{{ answer.text }}</b></li>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+</ol>
+
+<h2>Your result is: {{ score }} / {{ test.num_questions }} </h2>
+
+
+
+<h1>Top results</h1>
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>User Name</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for result in results %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ result[0] }}</td>
+        <td>{{ result[1] }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<h4><a href="{{ url_for('index') }}"> Grįžti į pagrindinį</a></h4>
+{% endif %}
+
+
+
+{% endblock %}
+
+
+
+
+
+
+

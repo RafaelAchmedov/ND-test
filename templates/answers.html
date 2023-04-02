@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post" action="" novalidate>
+    <br>
+    <div class="form-group">
+        {% for i in range(number_of_answers) %}
+        <div class="form-group">
+            <label for="atsakymas-{{ i }}">Atsakymas {{ i +1 }}</label>
+            <input type="text" name="answer-{{ i }}" id="atsakymas-{{ i }}" class="form-control"/>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="checkbox-{{ i }}" id="checkbox-{{ i }}" class="form-check-input">
+            <label class="form-check-label" for="checkbox-{{ i }}">Pažymėkite jei atsakymas teisingas</label>
+            <br>
+            <br>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+    {% if next_button %}
+        <button type="submit" name="next" value="next" class="btn btn-primary">Kitas klausimas</button>
+        <input type="hidden" name="action" value="new_question">
+    {% endif %}
+    {% if finish_button %}
+        <button type="submit" name="finish" value="finish" class="btn btn-primary">Užbaigti testą</button>
+        <input type="hidden" name="action" value="index">
+    {% endif %}
+</form>
+
+{% endblock %}
