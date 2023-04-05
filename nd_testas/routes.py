@@ -1,8 +1,9 @@
 from flask import render_template, request, redirect, url_for
-
-from forms import NewTestForm, NewQuestionForm
-from models import *
 from sqlalchemy import func
+
+from nd_testas.forms import NewTestForm, NewQuestionForm
+from nd_testas.models import Test, User, Result, Score, Question, Answer
+from nd_testas import app, db
 
 
 @app.route('/')
@@ -16,11 +17,18 @@ def test(test_id):
     test = Test.query.get(test_id)
     score = request.args.get('score')
     name = request.args.get('name')
-    results = db.session.query(User.name, Result.score). \
-        join(Result, Result.user_id == User.id). \
-        filter(Result.test_id == test_id).all()
+    user = User.query.filter_by(name=name).first()
+    if user:
+        selected_results = Result.query.filter_by(test_id=test_id, user_id=user.id).all()
+        selected_answer_ids = [result.answer_id for result in selected_results]
+    else:
+        selected_answer_ids = []
+    results = db.session.query(User.name, Score.score). \
+        join(Score, Score.user_id == User.id). \
+        filter(Score.test_id == test_id).all()
+
     sorted_list = sorted(results, key=lambda x: x[1], reverse=True)
-    return render_template('test.html', test=test, score=score, name=name, results=sorted_list, )
+    return render_template('test.html', test=test, score=score, name=name, results=sorted_list, selected_answer_ids=selected_answer_ids)
 
 
 @app.route('/submit_test/<int:test_id>', methods=['POST'])
@@ -39,12 +47,14 @@ def submit_test(test_id):
                 correct_answers.append(str(answer.id))
 
     score = 0
-    for selected_answer in selected_answers:
+    for selected_answer, question in zip(selected_answers, test.questions):
+        result = Result(test=test, user=user, question_id=question.id, answer_id=selected_answer)
+        db.session.add(result)
+        db.session.commit()
         if selected_answer in correct_answers:
             score += 1
-
-    result = Result(test=test, user=user, score=score)
-    db.session.add(result)
+    score_for_db = Score(user_id=user.id, score=score, test_id=test_id)
+    db.session.add(score_for_db)
     db.session.commit()
 
     return redirect(url_for('test', test_id=test_id, score=score, name=name))
@@ -110,6 +120,6 @@ def answers(question_id, num_answers, test_id):
 
 
 if __name__ == '__main__':
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(host='127.0.0.1', port=8000, debug=True)
