@@ -9,7 +9,9 @@
     <ul>
         {% for answer in question.answers %}
         <li>
-            <input type="checkbox" name="answers[]" value="{{ answer.id }}" id="{{ answer.id }}">
+            <input type="checkbox" name="answers[]" value="{{ answer.id }}" id="{{ answer.id }}"
+            {% if answer.id in selected_answer_ids %}checked{% endif %}
+            {% if answer.id in request.form.getlist('answers[]') %}checked{% endif %}>
             <label for="{{ answer.id }}">{{ answer.text }}</label>
         </li>
         {% endfor %}
@@ -18,25 +20,29 @@
 
     <input type="text" name="name" placeholder="Enter your name">
     <button type="submit">Submit</button>
-{% endif %}
 </form>
+{% endif %}
+
 
 {% if score is not none %}
 <h2>Dear, {{ name }}  </h2>
-<h2>Correct answers are:</h2>
-<ol>
-    {% for question in test.questions %}
-    {% for answer in question.answers %}
-    {% if answer.is_correct %}
-    <li>{{ question.text }} - <b>{{ answer.text }}</b></li>
-    {% endif %}
-    {% endfor %}
-    {% endfor %}
-</ol>
-
 <h2>Your result is: {{ score }} / {{ test.num_questions }} </h2>
 
 
+{% for question in test.questions %}
+<h3>{{ question.text }}</h3>
+<ul>
+    {% for answer in question.answers %}
+    {% if answer.is_correct %}
+    {% set correct_answer_id = answer.id %}
+    {% endif %}
+    <li>
+        <input type="checkbox" disabled {% if answer.id in selected_answer_ids %}checked{% endif %}>
+        <label {% if answer.id == correct_answer_id %}class="correct"{% endif %}>{{ answer.text }}</label>
+    </li>
+    {% endfor %}
+</ul>
+{% endfor %}
 
 <h1>Top results</h1>
 <table>
@@ -60,13 +66,10 @@
 <h4><a href="{{ url_for('index') }}"> Grįžti į pagrindinį</a></h4>
 {% endif %}
 
-
+<style>
+    label.correct {
+        background-color: lightgreen;
+    }
+</style>
 
 {% endblock %}
-
-
-
-
-
-
-
